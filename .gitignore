@@ -1,5 +1,4 @@
 # Created by pytest automatically.
 venv
-pytest_cache
-CACHEDIR.TAG
+.pytest_cache
 .idea
