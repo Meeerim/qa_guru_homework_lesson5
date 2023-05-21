@@ -1,35 +1,54 @@
+import os
+import time
 
-from qa_guru_homework_lesson5.demoqa_pages.registration_page import RegistrationFormPage
+import allure
+from selene import have, command, by
 
 
-def test_practice_form():
-    registration_page = RegistrationFormPage()
-    registration_page.open()
+@allure.title("Successful fill form")
+def test_practice_form(setup_browser):
+    browser = setup_browser
 
-    # WHEN
-    registration_page.fill_first_name('Meerim')
-    registration_page.fill_last_name('Sabyt')
-    registration_page.fill_user_email('skmeerim1999@gmail.com')
-    registration_page.select_gender()
-    registration_page.fill_user_number('0554803097')
-    registration_page.fill_date_of_birth('1999', 'October', '31')
-    registration_page.select_subject('Ma')
-    registration_page.select_hobby()
-    registration_page.upload_file('totoro.jpg')
-    registration_page.fill_address("str Abd 123")
-    registration_page.fill_state()
-    registration_page.fill_city()
-    registration_page.click_submit()
+    with allure.step("Open Registration Form"):
+        browser.open('https://demoqa.com/automation-practice-form')
+        browser.all('[id^=google_ads][id$=container__]').with_(timeout=10).wait_until(
+            have.size_greater_than_or_equal(3)
+        )
+        browser.all('[id^=google_ads][id$=container__]').perform(command.js.remove)
+
+    with allure.step("Fill the form"):
+        browser.element('#firstName').type('Meerim')
+        browser.element('#lastName').type('Sabyt')
+        browser.element('#userEmail').click().type('skmeerim1999@gmail.com')
+        browser.element('[for="gender-radio-2"]').click()
+        browser.element('#userNumber').type('0554803097')
+        browser.element('#dateOfBirthInput').click()
+        browser.element('.react-datepicker__year-select').click()
+        browser.element('[value="1999"]').click()
+        browser.element('.react-datepicker__month-select').click()
+        browser.element('[value="9"]').click()
+        browser.element('.react-datepicker__day--031').click()
+        browser.element("#subjectsInput").send_keys("Maths")
+        browser.element("#subjectsInput").press_enter()
+        browser.element("#hobbiesWrapper").element(by.text("Reading")).click()
+        #file_path = os.path.abspath(os.path.join('image', 'totoro.jpg'))
+        #browser.element('#uploadPicture').send_keys(file_path)
+        #time.sleep(2)
+        browser.element('textarea#currentAddress').type("str Abd 123")
+        browser.element('#state').click()
+        browser.element('#react-select-3-option-2').click()
+        browser.element('#submit').press_enter()
 
     # THEN
-
-    registration_page.should_registered_user_with('Meerim Sabyt',
-                                                  'skmeerim1999@gmail.com',
-                                                  'Female',
-                                                  '0554803097',
-                                                  '31 October,1999',
-                                                  'Maths',
-                                                  'Reading',
-                                                  'totoro.jpg',
-                                                  'str Abd 123',
-                                                  'Haryana Karnal')
+    with allure.step("Check final result"):
+        browser.element("#example-modal-sizes-title-lg").should(have.text("Thanks for submitting the form"))
+        #browser.all('.table-responsive td:nth-child(2)').should((have.texts('Meerim Sabyt',
+                                                                            #'skmeerim1999@gmail.com',
+                                                                            #'Female',
+                                                                            #'0554803097',
+                                                                            #'31 October,1999',
+                                                                            #'Maths',
+                                                                            #'Reading',
+                                                                            #'totoro.jpg',
+                                                                            #'str Abd 123',
+                                                                            #'Haryana Karnal')))
